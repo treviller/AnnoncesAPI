@@ -3,3 +3,7 @@ annonces_home:
     defaults:
         _controller: AnnoncesBundle:Annonces:home
         
+annonces_add:
+    path: /add
+    defaults:
+        _controller: AnnoncesBundle:Annonces:add

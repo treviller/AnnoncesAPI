@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="{{ app.request.basepath }}/bundles/annonces/bootstrap/css/bootstrap.min.css"/>
+		<title>{% block title %}{% endblock %} - Site d'annonces</title>
+	</head>
+	<body>
+		<div class="container">
+			<nav class="navbar navbar-inverse">
+				<div class="container-fluid">
+					<ul class="nav navbar-nav">
+						<li><a href="{{ path('annonces_home') }}">Accueil</a></li>
+						<li><a href="{{ path('annonces_add') }}">Ajouter une annonce</a></li>
+					</ul>
+				</div>
+			</nav>
+				
+		    {% block body %}{% endblock %}
+		
+			<hr>
+		
+			<footer>
+				<script src="{{ app.request.basepath }}/bundles/annonces/bootstrap/js/bootstrap.min.js"></script>
+			</footer>
+		</div>
+	</body>
+</html>
