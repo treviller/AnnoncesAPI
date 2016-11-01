@@ -12,10 +12,18 @@
 					<ul class="nav navbar-nav">
 						<li><a href="{{ path('annonces_home') }}">Accueil</a></li>
 						<li><a href="{{ path('annonces_add') }}">Ajouter une annonce</a></li>
+						<li><a href="{{ path('annonces_add_category') }}">Ajouter une catégorie</a></li>
 					</ul>
 				</div>
 			</nav>
 				
+			{% for key, messages in app.session.flashbag.all() %}
+				{% for message in messages %}
+				<div class="alert alert-{{ key }}">
+					{{ message }}
+				</div>
+				{% endfor %}
+			{% endfor %}
 		    {% block body %}{% endblock %}
 		
 			<hr>

@@ -75,9 +75,11 @@ class Annonce
     /**
      * @ORM\PrePersist()
      */
-    public function updateDatePost()
+    public function updateDatePostAndExpireAt()
     {
     	$this->setDatePost(new \Datetime());
+    	$date = new \Datetime();
+    	$this->setExpireAt($date->add(new \DateInterval('P10D')));
     }
     
     /**

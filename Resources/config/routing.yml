@@ -7,3 +7,13 @@ annonces_add:
     path: /add
     defaults:
         _controller: AnnoncesBundle:Annonces:add
+
+annonces_add_category:
+    path: /addCategory
+    defaults:
+        _controller: AnnoncesBundle:Annonces:addCategory
+
+annonces_add_ville:
+    path: /addVille
+    defaults:
+        _controller: AnnoncesBundle:Annonces:addVille
