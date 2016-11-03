@@ -10,10 +10,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AnnoncesController extends Controller
 {
-	public function homeAction()
+	public function homeAction(Request $request)
 	{
+		$em = $this->getDoctrine()->getManager();
 		
-		return $this->render('AnnoncesBundle:Annonces:home.html.twig');
+		$categories = $em->getRepository('AnnoncesBundle:Category')->findAll();
+		$annonces = array();
+		
+		if($request->isMethod('post') && $request->get('category') != null && $request->get('city') != null)
+		{	
+			$annonces = $em->getRepository('AnnoncesBundle:Annonce')->findAnnonces($request->get('category'), $request->get('city'));	
+		}
+		
+		return $this->render('AnnoncesBundle:Annonces:home.html.twig', array('categories' => $categories, 'annonces' => $annonces));
 	}
 	
 	public function addAction(Request $request)

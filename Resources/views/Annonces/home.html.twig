@@ -5,7 +5,53 @@ Home
 {% endblock %}
 
 {% block body %}
-<header>
+<header class="page-header">
 	<h1>Bienvenue sur ce nouveau site d'annonces !</h1>
 </header>
+
+<section class="row well">
+	<h3>Recherche d'annonces :</h3>
+	<br/>
+	<form method="post" action="{{ path('annonces_home') }}">
+		<div class="form-group row">
+			<label for="category" class="col-md-2 col-form-label">Categorie : </label>
+			<div class="col-md-10">
+				<select name="category" class="form-control">
+		  	    {% for category in categories %}
+					<option value="{{ category.name }}"{% if app.request.method == 'POST' and app.request.get('category') == category.name %}selected{% endif %}>{{ category.name }}</option>
+			    {% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label for="city" class="col-md-2 col-form-label">Ville :</label>
+			<div class="col-md-10">
+				<input type="text" name="city" class="form-control" id="annoncesbundle_annonce_city" {% if app.request.method == 'POST' %}value="{{ app.request.get('city') }}"{% endif %}/>
+			</div>
+		</div>
+		<div class="form-group row">
+			<input type="submit" value="Rechercher" class="btn btn-default pull-right"/>
+		</div>
+	</form>
+</section>
+
+<section class="row">
+{% if annonces %}
+	<h3>Résultats : </h3>
+	{% for annonce in annonces %}
+	<div class="well">
+		<strong>{{ annonce.title }}</strong> postée le {{ annonce.datePost|date("d/m/Y \\à H:i") }}
+		<button href="{{ path('annonces_home') }}" class="btn btn-default pull-right">Voir</button>
+	</div>
+	{% endfor %}
+{% elseif app.request.method == 'POST' %}
+	<strong>Aucune annonce trouvée.</strong>
+{% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ app.request.basepath }}/bundles/annonces/jquery/jquery.min.js"></script>
+	<script src="{{ app.request.basepath }}/bundles/annonces/jquery-ui/jquery-ui.min.js"></script>
+	<script src="{{ app.request.basepath }}/bundles/annonces/scripts/geonames-request.js"></script>
 {% endblock %}

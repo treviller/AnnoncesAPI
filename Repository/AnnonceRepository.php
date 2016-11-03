@@ -10,4 +10,19 @@ namespace AnnoncesBundle\Repository;
  */
 class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 {
+	public function findAnnonces($category, $city)
+	{
+		$query = $this->createQueryBuilder('a');
+		
+		$query
+			->innerJoin('a.category', 'c')
+			->addSelect('c')
+			->where('c.name = :category')
+			->setParameter('category', $category)
+			->andWhere('a.city = :city')
+			->setParameter('city', $city);
+		
+		return $query->getQuery()->getArrayResult();
+	}
+	
 }
