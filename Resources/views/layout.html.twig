@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<link rel="stylesheet" href="{{ app.request.basepath }}/bundles/annonces/bootstrap/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="{{ app.request.basepath }}/bundles/annonces/jquery-ui/jquery-ui.min.css"/>
 		<title>{% block title %}{% endblock %} - Site d'annonces</title>
 	</head>
 	<body>
@@ -30,6 +31,8 @@
 		
 			<footer>
 				<script src="{{ app.request.basepath }}/bundles/annonces/bootstrap/js/bootstrap.min.js"></script>
+				{% block scripts %}
+				{% endblock %}
 			</footer>
 		</div>
 	</body>

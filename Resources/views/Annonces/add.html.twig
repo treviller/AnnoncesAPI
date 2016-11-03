@@ -7,6 +7,32 @@ Ajouter une annonce
 
 {% block body %}
 	<div class=well>
-	    {{ form(form) }}
+        {{ form_start(form) }}
+        
+        {{ form_errors(form) }}
+        
+        {{ form_row(form.title) }}
+        
+        {{ form_row(form.content) }}
+        
+        {{ form_row(form.prix) }}
+        
+        {{ form_row(form.category) }}
+        
+        <div class="form-group">
+            {{ form_label(form.city, null, {'attr': {'class': 'control-label'}}) }}
+            
+            {{ form_widget(form.city, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        {{ form_rest(form) }}
+        
+        {{ form_end(form) }}
 	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ app.request.basepath }}/bundles/annonces/jquery/jquery.min.js"></script>
+	<script src="{{ app.request.basepath }}/bundles/annonces/jquery-ui/jquery-ui.min.js"></script>
+	<script src="{{ app.request.basepath }}/bundles/annonces/scripts/geonames-request.js"></script>
 {% endblock %}

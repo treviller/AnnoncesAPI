@@ -23,7 +23,7 @@ class AnnonceType extends AbstractType
         	->add('content', TextareaType::class)
         	->add('prix', NumberType::class)
         	->add('category', EntityType::class, array('class' => 'AnnoncesBundle:Category', 'choice_label' => 'name'))
-        	->add('city') 
+        	->add('city', TextType::class) 
         	->add('Ajouter', SubmitType::class)
         ;
     }

@@ -68,7 +68,7 @@ class Annonce
     /**
      * @var AnnoncesBundle\Entity\Ville
      * 
-     * @ORM\OneToOne(targetEntity="AnnoncesBundle\Entity\Ville")
+     * @ORM\Column(name="city", type="string", length=255)
      */
     private $city;
     

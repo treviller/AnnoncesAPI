@@ -16,11 +16,22 @@ class AnnoncesController extends Controller
 		return $this->render('AnnoncesBundle:Annonces:home.html.twig');
 	}
 	
-	public function addAction()
+	public function addAction(Request $request)
 	{
 		$annonce = new Annonce();
 		
 		$form = $this->get('form.factory')->create(AnnonceType::class, $annonce);
+		
+		if($request->isMethod("post") && $form->handleRequest($request)->isValid())
+		{
+			$em = $this->getDoctrine()->getManager();
+			
+			$em->persist($annonce);
+			$em->flush();
+				
+			$request->getSession()->getFlashBag()->add('info', 'L\'annonce a bien été ajoutée.');
+				
+		}
 		
 		return $this->render('AnnoncesBundle:Annonces:add.html.twig', array('form' => $form->createView()));
 	}
