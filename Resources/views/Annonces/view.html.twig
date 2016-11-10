@@ -1,0 +1,75 @@
+{% extends 'AnnoncesBundle::layout.html.twig' %}
+
+{% block title %}
+{{ annonce.title }}
+{% endblock %}
+
+{% block body %}
+	<header class="page-header">
+		<h2>{{ annonce.title }}</h2>
+			
+		<p>postée le {{ annonce.datePost|date('d/m/Y \\à H:i') }} à <strong>{{ annonce.city }}</strong> dans <i>{{ annonce.category.name }}</i></p>
+	</header>
+
+	<section class="row">
+		<div class="row">
+	        {% if annonce.photos.get(0) != null %}
+	        <div class="col-xs-8 thumbnail">
+				<img class="gdPhoto" src="{{ app.request.basepath ~ '/'~ annonce.photos.get(0).uploadDir ~ '/' ~ annonce.photos.get(0).id ~ '.' ~ annonce.photos.get(0).url }}">
+			</div>
+		    {% endif %}
+		</div>
+		<hr/>
+		<div id="miniatures" class="row">
+			{% if annonce.photos %}
+			{% for photo in annonce.photos %}
+			<div class="col-xs-2">
+	   			<a href="#" class="photo thumbnail">
+					<img class="miniatures" src="{{ app.request.basepath ~ '/'~ photo.uploadDir ~ '/' ~ photo.id ~ '.' ~ photo.url }}">
+				</a>
+			</div>
+			{% endfor %}
+		    {% endif %}
+		</div>
+	</section>
+	<section class="row">	
+		<article class="panel panel-default row">
+			<div class="panel-body">
+		        {{ annonce.content }}
+		    </div>
+		</article>
+		
+		<div class="well well-sm">
+			Prix : {% if annonce.prix %}{{ annonce.prix }}€{% else %}non défini{% endif %}
+		</div>
+		
+		<a href="{{ path('annonces_home') }}" class="btn btn-default">Retour à la liste des annonces</a>		
+		<a href="{{ path('annonces_edit', {'id': annonce.id}) }}" class="btn btn-default">Modifier</a>
+		<a href="{{ path('annonces_delete', {'id': annonce.id}) }}" class="btn btn-danger">Supprimer</a>
+	</section>
+	
+	
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ app.request.basepath }}/bundles/annonces/jquery/jquery.min.js"></script>
+	<script type="text/javascript">
+		var photos; 
+		var gdePhoto;
+		var miniatures;
+
+		jQuery(document).ready(function(){
+				liensPhotos = $('a.photo');
+				miniatures = $('img.miniatures');
+				gdePhoto = $('img.gdPhoto');
+				
+				liensPhotos.each(function(index){
+					$(this).on('click', function(e){
+						e.preventDefault();
+						gdePhoto.attr('src', $(miniatures[index]).attr('src'));
+					});
+				});
+			});
+	</script>
+{% endblock %}
+

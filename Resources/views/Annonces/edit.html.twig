@@ -1,7 +1,7 @@
 {% extends 'AnnoncesBundle::layout.html.twig' %}
 
 {% block title %}
-Ajouter une annonce
+Edition de {{ annonce.title }}
 {% endblock %}
 
 
@@ -21,12 +21,15 @@ Ajouter une annonce
         
         {{ form_row(form.city) }}
         
-         <ul id="photos-add-mode" class="list-group" data-prototype="{{ form_widget(form.photos.vars.prototype)|escape('html_attr') }}">
+        <ul id="photos-edit-mode" class="list-group" data-prototype="{{ form_widget(form.photos.vars.prototype)|escape('html_attr') }}">
         {% for photo in form.photos %}
-      	    <li class="list-group-item row ">
-       	        {{ form_errors(photo) }}
-       	        {{ form_widget(photo) }}
-        	</li>
+
+      	    <li class="list-group-item row" id="photo{{ loop.index0 }}">
+      	    	{{ form_errors(photo) }}
+      	    	{{ form_widget(photo) }}     
+       	        <img class="col-xs-3 thumbnail" src="{{ app.request.basepath ~ '/' ~ annonce.photos.get(loop.index0).uploadDir ~ '/' ~ annonce.photos.get(loop.index0).id ~ '.' ~ annonce.photos.get(loop.index0).url}}">
+        	</li> 
+  
         {% endfor %}
         </ul>
         
@@ -40,5 +43,5 @@ Ajouter une annonce
 	<script src="{{ app.request.basepath }}/bundles/annonces/jquery/jquery.min.js"></script>
 	<script src="{{ app.request.basepath }}/bundles/annonces/jquery-ui/jquery-ui.min.js"></script>
 	<script src="{{ app.request.basepath }}/bundles/annonces/scripts/geonames-request.js"></script>
-	<script src="{{ app.request.basepath }}/bundles/annonces/scripts/addPhoto.js"></script>
+	<script src="{{ app.request.basepath }}/bundles/annonces/scripts/addPhoto.js"></script
 {% endblock %}

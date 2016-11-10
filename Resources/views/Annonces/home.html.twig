@@ -17,6 +17,7 @@ Home
 			<label for="category" class="col-md-2 col-form-label">Categorie : </label>
 			<div class="col-md-10">
 				<select name="category" class="form-control">
+					<option value=""{% if app.request.method == 'POST' and app.request.get('category') == "" %}selected{% endif %}></option>
 		  	    {% for category in categories %}
 					<option value="{{ category.name }}"{% if app.request.method == 'POST' and app.request.get('category') == category.name %}selected{% endif %}>{{ category.name }}</option>
 			    {% endfor %}
@@ -40,8 +41,8 @@ Home
 	<h3>Résultats : </h3>
 	{% for annonce in annonces %}
 	<div class="well">
-		<strong>{{ annonce.title }}</strong> postée le {{ annonce.datePost|date("d/m/Y \\à H:i") }}
-		<button href="{{ path('annonces_home') }}" class="btn btn-default pull-right">Voir</button>
+		<strong>{{ annonce.title }}</strong> postée le {{ annonce.datePost|date("d/m/Y \\à H:i") }} dans <i>{{ annonce.category.name }}</i> à <strong>{{ annonce.city }}</strong>
+		<a href="{{ path('annonces_view', {'id': annonce.id}) }}" class="btn btn-default pull-right">Voir</a>
 	</div>
 	{% endfor %}
 {% elseif app.request.method == 'POST' %}

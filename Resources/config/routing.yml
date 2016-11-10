@@ -13,7 +13,18 @@ annonces_add_category:
     defaults:
         _controller: AnnoncesBundle:Annonces:addCategory
 
-annonces_add_ville:
-    path: /addVille
+annonces_view:
+    path: /view/{id}
     defaults:
-        _controller: AnnoncesBundle:Annonces:addVille
+        _controller: AnnoncesBundle:Annonces:view
+
+annonces_edit:
+    path: /edit/{id}
+    defaults:
+        _controller: AnnoncesBundle:Annonces:edit
+        
+annonces_delete:
+    path: /delete/{id}
+    defaults:
+        _controller: AnnoncesBundle:Annonces:delete
+               

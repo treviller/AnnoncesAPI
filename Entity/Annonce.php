@@ -4,6 +4,9 @@ namespace AnnoncesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use AnnoncesBundle\AnnoncesBundle;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Annonce
@@ -62,6 +65,7 @@ class Annonce
      * @var AnnoncesBundle\Entity\Category
      * 
      * @ORM\OneToOne(targetEntity="AnnoncesBundle\Entity\Category")
+     * @ORM\JoinColumn(unique=false)
      */
     private $category;
     
@@ -73,6 +77,18 @@ class Annonce
     private $city;
     
     /**
+     * @var AnnoncesBundle\Entity\Photo
+     * 
+     * @ORM\OneToMany(targetEntity="AnnoncesBundle\Entity\Photo", cascade={"persist", "remove"}, mappedBy="annonce")
+     */
+    private $photos;
+    
+    public function __construct()
+    {
+    	$this->photos = new ArrayCollection();
+    }
+    
+    /**
      * @ORM\PrePersist()
      */
     public function updateDatePostAndExpireAt()
@@ -80,6 +96,42 @@ class Annonce
     	$this->setDatePost(new \Datetime());
     	$date = new \Datetime();
     	$this->setExpireAt($date->add(new \DateInterval('P10D')));
+    }
+    
+    /**
+     *@Assert\Callback
+     */
+    public function isPhotosValid(ExecutionContextInterface $context)
+    {
+    	if(count($this->getPhotos()) >= 3)
+    	{
+    		$context
+    			->buildViolation('Vous ne pouvez inclure que 3 photos à cette annonce')
+    			->atPath('photos')
+    			->addViolation();
+    	}
+    	
+    }
+    
+    public function getPhotos()
+    {
+    	return $this->photos;
+    }
+    
+    public function setPhotos($photos)
+    {
+    	$this->photos = $photos;
+    }
+    
+    public function addPhoto(Photo $photo)
+    {
+    	$photo->setAnnonce($this);
+    	$this->photos[] = $photo;
+    }
+    
+    public function removePhoto(Photo $photo)
+    {
+    	$this->photos->removeElement($photo);
     }
     
     /**

@@ -25,4 +25,45 @@ class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 		return $query->getQuery()->getArrayResult();
 	}
 	
+	public function findAnnoncesByCity($city)
+	{
+		$query = $this->createQueryBuilder('a');
+	
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->andWhere('a.city = :city')
+		->setParameter('city', $city);
+	
+		return $query->getQuery()->getArrayResult();
+	}
+	
+	public function findAnnoncesByCategory($category)
+	{
+		$query = $this->createQueryBuilder('a');
+	
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->where('c.name = :category')
+		->setParameter('category', $category);
+	
+		return $query->getQuery()->getArrayResult();
+	}
+	
+	public function findAnnonceWithCatAndPhotos($id)
+	{
+		$query = $this->createQueryBuilder('a');
+		
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->leftJoin('a.photos', 'p')
+		->addSelect('p')
+		->where('a.id = :id')
+		->setParameter('id', $id);
+		
+		return $query->getQuery()->getOneOrNullResult();
+	}
+	
 }
