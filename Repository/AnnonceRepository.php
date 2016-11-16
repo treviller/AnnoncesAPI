@@ -20,8 +20,29 @@ class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 			->where('c.name = :category')
 			->setParameter('category', $category)
 			->andWhere('a.city = :city')
-			->setParameter('city', $city);
+			->setParameter('city', $city)
+			->andWhere('a.expireAt >= :now')
+			->setParameter('now', new \Datetime('now'));
 		
+		return $query->getQuery()->getArrayResult();
+	}
+	
+	public function findAnnoncesWithPhotos($category, $city)
+	{
+		$query = $this->createQueryBuilder('a');
+	
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->leftJoin('a.photos', 'p')
+		->addSelect('p')
+		->where('c.name = :category')
+		->setParameter('category', $category)
+		->andWhere('a.city = :city')
+		->setParameter('city', $city)
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'));
+	
 		return $query->getQuery()->getArrayResult();
 	}
 	
@@ -33,6 +54,25 @@ class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 		->innerJoin('a.category', 'c')
 		->addSelect('c')
 		->andWhere('a.city = :city')
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'))
+		->setParameter('city', $city);
+	
+		return $query->getQuery()->getArrayResult();
+	}
+	
+	public function findAnnoncesByCityWithPhotos($city)
+	{
+		$query = $this->createQueryBuilder('a');
+	
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->leftJoin('a.photos', 'p')
+		->addSelect('p')
+		->andWhere('a.city = :city')
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'))
 		->setParameter('city', $city);
 	
 		return $query->getQuery()->getArrayResult();
@@ -46,6 +86,25 @@ class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 		->innerJoin('a.category', 'c')
 		->addSelect('c')
 		->where('c.name = :category')
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'))
+		->setParameter('category', $category);
+	
+		return $query->getQuery()->getArrayResult();
+	}
+	
+	public function findAnnoncesByCategoryWithPhotos($category)
+	{
+		$query = $this->createQueryBuilder('a');
+	
+		$query
+		->innerJoin('a.category', 'c')
+		->addSelect('c')
+		->leftJoin('a.photos', 'p')
+		->addSelect('p')
+		->where('c.name = :category')
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'))
 		->setParameter('category', $category);
 	
 		return $query->getQuery()->getArrayResult();
@@ -61,6 +120,8 @@ class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 		->leftJoin('a.photos', 'p')
 		->addSelect('p')
 		->where('a.id = :id')
+		->andWhere('a.expireAt >= :now')
+		->setParameter('now', new \Datetime('now'))
 		->setParameter('id', $id);
 		
 		return $query->getQuery()->getOneOrNullResult();

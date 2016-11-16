@@ -28,3 +28,21 @@ annonces_delete:
     defaults:
         _controller: AnnoncesBundle:Annonces:delete
                
+villes:
+    resource: "@AnnoncesBundle/Controller/ApiVillesController.php"
+    type: annotation
+    defaults: {_format: json}
+    prefix: /api
+    
+categories:
+    resource: "@AnnoncesBundle/Controller/ApiCategoriesController.php"
+    type: annotation
+    defaults: {_format: json}
+    prefix: /api
+    
+annonces:
+    resource: "@AnnoncesBundle/Controller/ApiAnnoncesController.php"
+    type: annotation
+    defaults: {_format: json}
+    prefix: /api
+    

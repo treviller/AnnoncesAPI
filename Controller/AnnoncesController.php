@@ -9,8 +9,6 @@ use AnnoncesBundle\Entity\Category;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use AnnoncesBundle\Entity\Photo;
-use Symfony\Component\HttpFoundation\File\File;
-use AnnoncesBundle\Form\Type\PhotoType;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AnnoncesController extends Controller
@@ -45,6 +43,14 @@ class AnnoncesController extends Controller
 		
 		if($request->isMethod("post") && $form->handleRequest($request)->isValid())
 		{
+			foreach($annonce->getPhotos() as $photo)
+			{
+				if($photo->getFile() == null)
+				{
+					$annonce->removePhoto($photo);
+				}
+			}
+			
 			$em = $this->getDoctrine()->getManager();
 			
 			$em->persist($annonce);

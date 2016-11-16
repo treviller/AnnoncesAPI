@@ -88,6 +88,18 @@ class Annonce
     	$this->photos = new ArrayCollection();
     }
     
+    public function hydrate(array $data)
+    {
+    	foreach($data as $propertyName => $value)
+    	{
+    		$method = 'set'.ucfirst($propertyName);
+    		if(method_exists($this, $method))
+    		{
+    			$this->$method($value);
+    		}
+    	}
+    }
+    
     /**
      * @ORM\PrePersist()
      */
@@ -103,7 +115,7 @@ class Annonce
      */
     public function isPhotosValid(ExecutionContextInterface $context)
     {
-    	if(count($this->getPhotos()) >= 3)
+    	if(count($this->getPhotos()) > 3)
     	{
     		$context
     			->buildViolation('Vous ne pouvez inclure que 3 photos à cette annonce')
