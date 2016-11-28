@@ -3,7 +3,6 @@
 namespace AnnoncesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -27,7 +26,7 @@ class Photo
     /**
      * @var string
      *
-     * @ORM\Column(name="url", type="string", length=255, unique=true)
+     * @ORM\Column(name="url", type="string", length=255, unique=false)
      */
     private $url;
 
@@ -44,9 +43,16 @@ class Photo
      */
     private $annonce;
     
+	/**
+	 * 
+	 * @var \DateTime
+	 * 
+	 * @ORM\Column(name="expiredAt", type="datetime", nullable=true)
+	 */
+    private $expiredAt;
+    
     /**
      * @ORM\PrePersist()
-     * @ORM\PreUpdate()
      */
     public function preUpload()
     {
@@ -55,7 +61,6 @@ class Photo
     
     /**
      * @ORM\PostPersist()
-     * @ORM\PostUpdate()
      */
     public function postUpload()
     {
@@ -98,6 +103,16 @@ class Photo
     	return '/uploads/photos';
     }
     
+    public function getExpiredAt()
+    {
+    	return $this->expiredAt;
+    }
+    
+    public function setExpiredAt($expiredAt)
+    {
+    	$this->expiredAt = $expiredAt;
+    }
+    
     public function getFile()
     {
     	return $this->file;
@@ -113,7 +128,7 @@ class Photo
     	$this->annonce = $annonce;
     }
     
-    public function getAnnonce($annonce)
+    public function getAnnonce()
     {
     	return $this->annonce;
     }

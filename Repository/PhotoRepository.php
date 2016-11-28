@@ -10,4 +10,14 @@ namespace AnnoncesBundle\Repository;
  */
 class PhotoRepository extends \Doctrine\ORM\EntityRepository
 {
+	public function findUnassociatedPhotos()
+	{
+		$query = $this
+					->createQueryBuilder('p')
+					->where('p.annonce IS NULL')
+					->andWhere('p.expiredAt <= :dateExpiration')
+					->setParameter('dateExpiration', new \Datetime('now'));
+		
+		return $query->getQuery()->getResult();
+	}
 }

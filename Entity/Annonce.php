@@ -7,6 +7,7 @@ use AnnoncesBundle\AnnoncesBundle;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use AnnoncesBundle\Constraints as AnnoncesBundleAssert;
 
 /**
  * Annonce
@@ -64,7 +65,7 @@ class Annonce
     /**
      * @var AnnoncesBundle\Entity\Category
      * 
-     * @ORM\OneToOne(targetEntity="AnnoncesBundle\Entity\Category")
+     * @ORM\ManyToOne(targetEntity="AnnoncesBundle\Entity\Category")
      * @ORM\JoinColumn(unique=false)
      */
     private $category;
@@ -72,7 +73,9 @@ class Annonce
     /**
      * @var AnnoncesBundle\Entity\Ville
      * 
-     * @ORM\Column(name="city", type="string", length=255)
+     * @AnnoncesBundleAssert\CityExist
+     * @ORM\OneToOne(targetEntity="AnnoncesBundle\Entity\Ville", cascade={"persist"})
+     * @ORM\JoinColumn(unique=false)
      */
     private $city;
     
@@ -143,6 +146,7 @@ class Annonce
     
     public function removePhoto(Photo $photo)
     {
+    	$photo->setAnnonce(null);
     	$this->photos->removeElement($photo);
     }
     

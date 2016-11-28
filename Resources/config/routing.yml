@@ -46,3 +46,10 @@ annonces:
     defaults: {_format: json}
     prefix: /api
     
+photos:
+    resource: "@AnnoncesBundle/Controller/ApiPhotosController.php"
+    type: annotation
+    defaults: { _format: json }
+    prefix: /api
+    
+    

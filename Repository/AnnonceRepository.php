@@ -10,104 +10,48 @@ namespace AnnoncesBundle\Repository;
  */
 class AnnonceRepository extends \Doctrine\ORM\EntityRepository
 {
-	public function findAnnonces($category, $city)
+	public function findAnnonces(array $criterias, $withPhotos=false)
 	{
-		$query = $this->createQueryBuilder('a');
+		$query = $this->createQueryBuilder('a')
+						->innerJoin('a.category', 'c')
+						->addSelect('c')
+						->innerJoin('a.city', 'v')
+						->addSelect('v');
+		
+		if($withPhotos)
+		{
+			$query
+				->leftJoin('a.photos', 'p')
+				->addSelect('p');
+		}
+
+		if(isset($criterias['category']) && !empty($criterias['category']) && isset($criterias['city']) && !empty($criterias['city']))
+		{
+			$query
+				->where('c.name = :category')
+				->setParameter('category', $criterias['category'])
+				->andWhere('v.name = :city')
+				->setParameter('city', $criterias['city']);
+			
+		}
+		elseif(isset($criterias['category']) && !empty($criterias['category']))
+		{
+			$query
+				->where('c.name = :category')
+				->setParameter('category', $criterias['category']);
+		}
+		else
+		{
+			$query
+				->andWhere('v.name = :city')
+				->setParameter('city', $criterias['city']);
+		}
 		
 		$query
-			->innerJoin('a.category', 'c')
-			->addSelect('c')
-			->where('c.name = :category')
-			->setParameter('category', $category)
-			->andWhere('a.city = :city')
-			->setParameter('city', $city)
 			->andWhere('a.expireAt >= :now')
 			->setParameter('now', new \Datetime('now'));
 		
-		return $query->getQuery()->getArrayResult();
-	}
-	
-	public function findAnnoncesWithPhotos($category, $city)
-	{
-		$query = $this->createQueryBuilder('a');
-	
-		$query
-		->innerJoin('a.category', 'c')
-		->addSelect('c')
-		->leftJoin('a.photos', 'p')
-		->addSelect('p')
-		->where('c.name = :category')
-		->setParameter('category', $category)
-		->andWhere('a.city = :city')
-		->setParameter('city', $city)
-		->andWhere('a.expireAt >= :now')
-		->setParameter('now', new \Datetime('now'));
-	
-		return $query->getQuery()->getArrayResult();
-	}
-	
-	public function findAnnoncesByCity($city)
-	{
-		$query = $this->createQueryBuilder('a');
-	
-		$query
-		->innerJoin('a.category', 'c')
-		->addSelect('c')
-		->andWhere('a.city = :city')
-		->andWhere('a.expireAt >= :now')
-		->setParameter('now', new \Datetime('now'))
-		->setParameter('city', $city);
-	
-		return $query->getQuery()->getArrayResult();
-	}
-	
-	public function findAnnoncesByCityWithPhotos($city)
-	{
-		$query = $this->createQueryBuilder('a');
-	
-		$query
-		->innerJoin('a.category', 'c')
-		->addSelect('c')
-		->leftJoin('a.photos', 'p')
-		->addSelect('p')
-		->andWhere('a.city = :city')
-		->andWhere('a.expireAt >= :now')
-		->setParameter('now', new \Datetime('now'))
-		->setParameter('city', $city);
-	
-		return $query->getQuery()->getArrayResult();
-	}
-	
-	public function findAnnoncesByCategory($category)
-	{
-		$query = $this->createQueryBuilder('a');
-	
-		$query
-		->innerJoin('a.category', 'c')
-		->addSelect('c')
-		->where('c.name = :category')
-		->andWhere('a.expireAt >= :now')
-		->setParameter('now', new \Datetime('now'))
-		->setParameter('category', $category);
-	
-		return $query->getQuery()->getArrayResult();
-	}
-	
-	public function findAnnoncesByCategoryWithPhotos($category)
-	{
-		$query = $this->createQueryBuilder('a');
-	
-		$query
-		->innerJoin('a.category', 'c')
-		->addSelect('c')
-		->leftJoin('a.photos', 'p')
-		->addSelect('p')
-		->where('c.name = :category')
-		->andWhere('a.expireAt >= :now')
-		->setParameter('now', new \Datetime('now'))
-		->setParameter('category', $category);
-	
-		return $query->getQuery()->getArrayResult();
+		return $query->getQuery()->getResult();
 	}
 	
 	public function findAnnonceWithCatAndPhotos($id)

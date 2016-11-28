@@ -41,7 +41,7 @@ Home
 	<h3>Résultats : </h3>
 	{% for annonce in annonces %}
 	<div class="well">
-		<strong>{{ annonce.title }}</strong> postée le {{ annonce.datePost|date("d/m/Y \\à H:i") }} dans <i>{{ annonce.category.name }}</i> à <strong>{{ annonce.city }}</strong>
+		<strong>{{ annonce.title }}</strong> postée le {{ annonce.datePost|date("d/m/Y \\à H:i") }} dans <i>{{ annonce.category.name }}</i> à <strong>{{ annonce.city.name }}</strong>
 		<a href="{{ path('annonces_view', {'id': annonce.id}) }}" class="btn btn-default pull-right">Voir</a>
 	</div>
 	{% endfor %}

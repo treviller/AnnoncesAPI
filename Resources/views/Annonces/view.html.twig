@@ -8,7 +8,7 @@
 	<header class="page-header">
 		<h2>{{ annonce.title }}</h2>
 			
-		<p>postée le {{ annonce.datePost|date('d/m/Y \\à H:i') }} à <strong>{{ annonce.city }}</strong> dans <i>{{ annonce.category.name }}</i></p>
+		<p>postée le {{ annonce.datePost|date('d/m/Y \\à H:i') }} à <strong>{{ annonce.city.name }}</strong> dans <i>{{ annonce.category.name }}</i></p>
 	</header>
 
 	<section class="row">

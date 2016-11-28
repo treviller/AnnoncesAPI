@@ -10,6 +10,8 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use AnnoncesBundle\Entity\Annonce;
+use FOS\RestBundle\Controller\Annotations\FileParam;
+use AnnoncesBundle\Entity\Photo;
 
 class ApiAnnoncesController extends FOSRestController
 {
@@ -19,58 +21,43 @@ class ApiAnnoncesController extends FOSRestController
 	 * 
 	 * @QueryParam(name="ville", requirements="[a-zA-Zéêàè-]+", strict=true, nullable=true)
 	 * @QueryParam(name="category", requirements="[a-zA-Zéêèà-]+", strict=true, nullable=true)
+	 * @QueryParam(name="page", requirements="\d+", strict=false, default=1)
 	 * @Get("/annonces")
 	 */
 	public function getAnnoncesAction(ParamFetcher $paramFetcher)
 	{
 		$ville = $paramFetcher->get('ville');
 		$category = $paramFetcher->get('category');
+		$page = intval($paramFetcher->get('page'));
 		
 		$repository = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Annonce');
 		
 		if($category == null && $ville == null)
 		{
-			$error = array(
-					'code' => 400,
-					'message' => 'Le paramètre \'ville\' ou \'category\' doit être renseigné'
-			);
-			$data = array('error' => $error);
-			
-			$view = $this->view($data, 400);
+			$view = $this->generateError('Le paramètre \'ville\' ou \'category\' doit être renseigné', 400);
 		}
 		else
 		{
-			if($category == null)
-			{
-				$annonces = $repository->findAnnoncesByCityWithPhotos($ville);
-			
-			}
-			elseif($ville == null)
-			{
-				$annonces  = $repository->findAnnoncesByCategoryWithPhotos($category);
-			}
-			else 
-			{
-				$annonces = $repository->findAnnoncesWithPhotos($ville, $category);
-			}
-			
+			$annonces = $repository->findAnnonces(array('city' => $ville, 'category' => $category), true);
+
 			if($annonces == null)
 			{
-				$error = array(
-						'code' => 404,
-						'message' => 'Annonce introuvable'
-				);
-				$resultat = array('error' => $error);
-				$view = $this->view($resultat, 404);
+				$view = $this->view(array('Aucune annonce trouvée'), 200);
 			}
 			else
 			{
-				$resultat = array('annonces' => $annonces);
+				
+				foreach($annonces as $annonce)
+				{
+					$this->setFullUrlPhotos($annonce->getPhotos());
+				}
+				$resultat = array('page' => $page,
+								'count' => count($annonces), 
+								'annonces' => $annonces);
 				$view = $this->view($resultat, 200);
 			}
 			
 		}
-	
 		return $this->handleView($view);
 	}
 	
@@ -87,19 +74,11 @@ class ApiAnnoncesController extends FOSRestController
 		
 		if(null == $annonce)
 		{
-			$error = array(
-					'code' => 404,
-					'message' => 'Annonce introuvable'
-			);
-			$resultat = array('error' => $error);
-			$view = $this->view($resultat, 404);
+			$view = $this->generateError('Annonce introuvable', 404);
 		}
 		else
 		{
-			/*foreach($annonce->getPhotos() as $photo) Est ce qu'on rajoute le fichier à l'envoi ?
-			{
-				$photo->defineFileAfterLoad();
-			}*/
+			$this->setFullUrlPhotos($annonce->getPhotos());
 			$resultat = array('annonce' => $annonce);
 			$view = $this->view($resultat, 200);
 		}
@@ -111,36 +90,37 @@ class ApiAnnoncesController extends FOSRestController
 	 * @RequestParam(name="title", requirements=".+")
 	 * @RequestParam(name="content", requirements=".+")
 	 * @RequestParam(name="prix", requirements="\d+", strict=false)
-	 * @RequestParam(name="category")
-	 * @RequestParam(name="city", requirements="[a-zA-Zéêèà-]+")
-	 * @RequestParam(name="photos", strict=false, default=null)
+	 * @RequestParam(name="category", strict=false, requirements="[a-zA-Zéêèà-]+")
+	 * @RequestParam(name="id_category", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="city", strict=false, requirements="[a-zA-Zéêèà-]+")
+	 * @RequestParam(name="id_city", strict=false, requirements="\d+")
+	 * @RequestParam(name="id_photo_1", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="id_photo_2", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="id_photo_3", strict=false, requirements="\d+", default=null)
 	 * @Post("/annonces")
 	 */
 	public function postAnnoncesAction(ParamFetcher $paramFetcher)
 	{
 		$annonce = new Annonce();
-		$em = $this->getDoctrine()->getManager();
 		
 		$parameters = $paramFetcher->all();
 		
-		$parameters['category'] = $em->getRepository('AnnoncesBundle:Category')->findOneBy($parameters['category']);
+		$view = $this->handleAnnonce($annonce, $parameters);
 		
-		$annonce->hydrate($parameters);
-		
-		$em->persist($annonce);
-		$em->flush();
-		
-		$view = $this->view('', 204);
 		return $this->handleView($view);
 	}
 	
 	/**
-	 * @RequestParam(name="title", requirements=".+", default=null, strict=false)
-	 * @RequestParam(name="content", requirements=".+", default=null, strict=false)
-	 * @RequestParam(name="prix", requirements="\d+", default=null, strict=false)
-	 * @RequestParam(name="category", default=null, strict=false)
-	 * @RequestParam(name="city", requirements="[a-zA-Zéêèà-]+", default=null, strict=false)
-	 * @RequestParam(name="photos", strict=false, default=null)
+	 * @RequestParam(name="title", requirements=".+")
+	 * @RequestParam(name="content", requirements=".+")
+	 * @RequestParam(name="prix", requirements="\d+", strict=false)
+	 * @RequestParam(name="category", strict=false, requirements="[a-zA-Zéêèà-]+")
+	 * @RequestParam(name="id_category", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="city", strict=false, requirements="[a-zA-Zéêèà-]+")
+	 * @RequestParam(name="id_city", strict=false, requirements="\d+")
+	 * @RequestParam(name="id_photo_1", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="id_photo_2", strict=false, requirements="\d+", default=null)
+	 * @RequestParam(name="id_photo_3", strict=false, requirements="\d+", default=null)
 	 * @Put("/annonces/{id}", requirements={"id" = "\d+"})
 	 */
 	public function putAnnonceAction(ParamFetcher $paramFetcher, $id)
@@ -150,32 +130,33 @@ class ApiAnnoncesController extends FOSRestController
 		
 		if($annonce == null)
 		{
-			$error = array(
-					'code' => 404,
-					'message' => 'Annonce introuvable'
-			);
-			$resultat = array('error' => $error);
-			$view = $this->view($resultat, 404);
+			$view = $this->generateError('Annonce introuvable', 404);
 		}
 		else
 		{
 			$parameters = $paramFetcher->all();
 			
-			if($parameters['category'] != null)
-				$parameters['category'] = $em->getRepository('AnnoncesBundle:Category')->findOneBy($parameters['category']);
-			
-			foreach($parameters as $propertyName => $value)
+			//On enlève les anciennes photos
+			if(isset($parameters['id_photo_1']) || isset($parameters['id_photo_2']) || isset($parameters['id_photo_3']))
 			{
-				if($parameters[$propertyName] == null)
-					unset($parameters[$propertyName]);
+				if(!$annonce->getPhotos()->isEmpty())
+				{
+					foreach($annonce->getPhotos() as $photo)
+					{
+						$annonce->removePhoto($photo);
+						if($photo->getId() !== $parameters['id_photo_1'] && $photo->getId() !== $parameters['id_photo_2'] && $photo->getId() !== $parameters['id_photo_3'])
+						{
+							var_dump($photo);
+							//$em->remove($photo);
+						}
+						else
+							$em->persist($photo);
+					}
+					$em->flush();
+				}
 			}
-		
-			$annonce->hydrate($parameters);
-		
-			$em->persist($annonce);
-			$em->flush();
-		
-			$view = $this->view('', 204);
+			
+			$view = $this->handleAnnonce($annonce, $parameters);
 		}
 		return $this->handleView($view);
 	}
@@ -192,20 +173,88 @@ class ApiAnnoncesController extends FOSRestController
 		
 		if(null == $annonce)
 		{
-			$error = array(
-					'code' => 404,
-					'message' => 'Annonce introuvable'
-			);
-			$resultat = array('error' => $error);
-			$view = $this->view($resultat, 404);
+			$view = $this->generateError('Annonce introuvable', 404);
 		}
 		else
 		{
 			$em->remove($annonce);
-			$resultat = array('Annonce '.$id.' bien supprimée.');
-			$view = $this->view($resultat, 200);
+			$view = $this->view('', 204);
 		}
 		return $this->handleView($view);
 	}
+	
+	protected function generateError($message, $code, $args='')
+	{
+		$error = array(
+				'code' => $code,
+				'details' => $args,
+				'message' => $message
+		);
+		$resultat = array('error' => $error);
+		return $this->view($resultat, $code);
+	}
+	
+	protected function setFullUrlPhotos($photos)
+	{
+		foreach($photos as $photo)
+		{
+			$photo->setUrl($photo->getUploadDir().'/'.$photo->getId().'.'.$photo->getUrl());
+		}
+	}
+	
+	protected function handleAnnonce($annonce, $parameters)
+	{
+		$em = $this->getDoctrine()->getManager();
+		//Gestion de la catégorie
+		if($parameters['id_category'] != null)
+		{
+			$parameters['category'] = $em->getRepository('AnnoncesBundle:Category')->findOneBy(array('id' => $parameters['id_category']));
+			unset($parameters['id_category']);
+		}
+		elseif($parameters['category'] != null)
+		$parameters['category'] = $em->getRepository('AnnoncesBundle:Category')->findOneBy(array('name' => $parameters['category']));
+		else
+			return $this->generateError('Aucune catégorie n\'a été spécifiée.', 400);
+		
+		//Gestion de la ville
+		if($parameters['id_city'] != null)
+		{
+			$parameters['city'] = $em->getRepository('AnnoncesBundle:Ville')->findOneBy(array('id' => $parameters['id_city']));
+			unset($parameters['id_city']);
+		}
+		elseif($parameters['city'] != null)
+		{
+			$parameters['city'] = $em->getRepository('AnnoncesBundle:Ville')->findOneBy(array('name' => $parameters['city']));
+		}
+		else
+			return $this->generateError('Aucune ville n\' a été spécifiée.', 400);
+				
+		//Gestion des photos
+		for($i = 1 ; $i < 4 ; $i++)
+		{
+			if($parameters['id_photo_'.$i] != null)
+			{
+				$photo = $em->getRepository('AnnoncesBundle:Photo')->findOneBy(array('id' => intval($parameters['id_photo_'.$i])));
 
+				if($photo === null)
+				{
+					return $this->generateError('Cette photo est introuvable', 404, array('id' => $parameters['id_photo_'.$i]));
+				}
+				if($photo->getAnnonce() !== null)
+				{
+					return $this->generateError('Cette photo est déjà utilisée dans une autre annonce.', 400, array('id' => $parameters['id_photo_'.$i]));
+				}
+				$annonce->addPhoto($photo);
+				unset($parameters['id_photo_'.$i]);
+			}
+		}
+
+		//Gestion du reste des données
+		$annonce->hydrate($parameters);
+
+		$em->persist($annonce);
+		$em->flush();
+
+		return $this->view('', 200);
+	}
 }

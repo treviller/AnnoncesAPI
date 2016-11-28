@@ -1,0 +1,11 @@
+
+services:
+    annonces.geonamesapi:
+        class: AnnoncesBundle\GeonamesAPI\GeonamesInterface
+        
+    validator.city_exist:
+        class: AnnoncesBundle\Constraints\CityExistValidator
+        arguments: 
+          - "@annonces.geonamesapi"
+        tags:
+          - { name: validator.constraint_validator }

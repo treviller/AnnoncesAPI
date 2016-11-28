@@ -5,19 +5,38 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use FOS\RestBundle\Request\ParamFetcher;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 class ApiVillesController extends FOSRestController
-{
+{	
 	/**
-	 * 
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 * @RequestParam(name="name", requirements="[a-zA-Zéèêà-]+")
-	 * @Post("/villes")
+	 * @QueryParam(name="page", requirements="\d+", strict=false, default=1)
+	 * @Get("/villes")
 	 */
-	public function postVillesAction(ParamFetcher $paramFetcher)
+	public function getVillesAction(ParamFetcher $paramFetcher)
 	{
-		$view = $this->view(array($paramFetcher->get('name')), 204);//A modifier selon nécessaire ou pas
+		$page = intval($paramFetcher->get('page'));
+		$villes = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Ville')->findAllWithPage($page);
 		
-		return $this->handleView($view);
+		if($villes === null)
+		{
+			$resultat = array('Il n\'y a aucune ville enregistrée');
+		}
+		else 
+		{
+			$listVilles = array();
+			
+			foreach($villes as $ville)
+			{
+				$listVilles[] = $ville;
+			}
+			$resultat = array('page' => $page,
+					'total_per_page' => 10,
+					'count' => count($villes),
+					'categories' => $listVilles);
+		}
+		
+		return $this->handleView($this->view($resultat, 200));
 	}
 }

@@ -18,7 +18,7 @@
 			editMode = true;
 		}
 		
-	    nbPhotos = $listePhotos.find(':input').length;
+	    nbPhotos = ($listePhotos.find(':input').length /2);
 	     
 	    //Initialisation
 		for(i=0 ; i<nbPhotos ; i++)
@@ -26,6 +26,10 @@
 			if(editMode)
 			{
 				$('#annoncesbundle_annonce_photos_'+i+'_file').attr('disabled', 'disabled');
+			}
+			else
+			{
+				$($('#photos-add-mode li')[i]).attr('id', 'photo'+i);
 			}
 			$('#annoncesbundle_annonce_photos_'+i).after(createRemoveButton(i));
 		}
@@ -58,19 +62,19 @@
 	    	$('#addButton').attr('disabled', 'disabled');
 		}
 
-	    var $newPhotoFormLi = $('<li class="list-group-item row"></li>').append(newPhotoForm);
+	    var $newPhotoFormLi = $('<li id="photo'+(nbPhotos-1)+'" class="list-group-item row"></li>').append(newPhotoForm);
 	    $addButton.before($newPhotoFormLi);
 	    $('#annoncesbundle_annonce_photos_'+(nbPhotos-1)).after(createRemoveButton((nbPhotos-1)));
 	}
 	
 	function createRemoveButton(index)
 	{
-		$button = $('<button id="removeButton'+index+'" class="btn btn-danger">Supprimer</button>');
+		$button = $('<button id="'+index+'" class="btn btn-danger">Supprimer</button>');
 
 		$button.on('click', function(e)
 			{
 				e.preventDefault();
-				$('form ul li:nth-child('+(index+1)+')').remove();
+				$('#photo'+$(this).attr('id')).remove();
 				refreshIndex();
 				nbPhotos--;
 				if(nbPhotos == 0)
@@ -91,6 +95,15 @@
 			$($('ul li div div input')[i]).attr('name', 'annoncesbundle_annonce[photos]['+i+'][file]');
 			$($('ul li div:not(div.form-group)')[i]).attr('id', 'annoncesbundle_annonce_photos_'+i);
 			$($('ul li div div label')[i]).attr('for', 'annoncesbundle_annonce_photos_'+i+'_file');
+			$($('ul li button')[i]).attr('id', i);
+			if(editMode)
+			{
+				$($('#photos-edit-mode li')[i]).attr('id', 'photo'+i);
+			}
+			else
+			{
+				$($('#photos-add-mode li')[i]).attr('id', 'photo'+i);
+			}
 		}
 	}
 	

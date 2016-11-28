@@ -7,6 +7,7 @@ use FOS\RestBundle\Controller\Annotations\RequestParam;
 use FOS\RestBundle\Request\ParamFetcher;
 use AnnoncesBundle\Entity\Category;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 class ApiCategoriesController extends FOSRestController
 {
@@ -47,10 +48,12 @@ class ApiCategoriesController extends FOSRestController
 	
 	/**
 	 * @Get("/categories")
+	 * @QueryParam(name="page", requirements="\d+", strict=false, default=1)
 	 */
-	public function getCategoriesAction()
+	public function getCategoriesAction(ParamFetcher $paramFetcher)
 	{
-		$categories = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Category')->findAll();
+		$page =  intval($paramFetcher->get('page'));
+		$categories = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Category')->findAllWithPage($page);
 		
 		if($categories == null)
 		{
@@ -58,7 +61,15 @@ class ApiCategoriesController extends FOSRestController
 		}
 		else
 		{
-			$resultat = array('categories' => $categories);
+			$listCategories = array();
+			foreach($categories as $category)
+			{
+				$listCategories[] = $category; 
+			}
+			$resultat = array('page' => $page,
+							'total_per_page' => 10,
+							'count' => count($categories), 
+							'categories' => $listCategories);
 		}
 		
 		return $this->handleView($this->view($resultat, 200));

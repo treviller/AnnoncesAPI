@@ -3,15 +3,14 @@
 namespace AnnoncesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Category
+ * Ville
  *
- * @ORM\Table(name="category")
- * @ORM\Entity(repositoryClass="AnnoncesBundle\Repository\CategoryRepository")
+ * @ORM\Table(name="ville")
+ * @ORM\Entity(repositoryClass="AnnoncesBundle\Repository\VilleRepository")
  */
-class Category
+class Ville
 {
     /**
      * @var int
@@ -29,11 +28,6 @@ class Category
      */
     private $name;
 
-  
-	public function __construct()
-	{
-		$this->annonces = new ArrayCollection();
-	}
 
     /**
      * Get id
@@ -50,7 +44,7 @@ class Category
      *
      * @param string $name
      *
-     * @return Category
+     * @return Ville
      */
     public function setName($name)
     {
