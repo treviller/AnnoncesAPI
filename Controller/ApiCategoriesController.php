@@ -23,7 +23,7 @@ class ApiCategoriesController extends FOSRestController
 		
 		$em = $this->getDoctrine()->getManager();
 		
-		if($em->getRepository('AnnoncesBundle:Category')->findOneBy(array('name' => $name)) != null)
+		if($em->getRepository('AnnoncesBundle:Category')->findOneBy(array('name' => $name)) !== null)
 		{
 			$error = array(
 				'code' => 409,
@@ -40,7 +40,7 @@ class ApiCategoriesController extends FOSRestController
 			$em->persist($category);
 			$em->flush();
 			
-			$view = $this->view("", 204);
+			$view = $this->view($category, 201);
 		}
 		
 		return $this->handleView($view);

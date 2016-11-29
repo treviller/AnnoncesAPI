@@ -125,6 +125,8 @@ class Photo
     
     public function setAnnonce($annonce)
     {
+    	//On enlève la date d'expiration pour éviter la suppression maintenant que la photo est utilisée.
+    	$this->setExpiredAt(null);
     	$this->annonce = $annonce;
     }
     

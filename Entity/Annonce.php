@@ -74,7 +74,7 @@ class Annonce
      * @var AnnoncesBundle\Entity\Ville
      * 
      * @AnnoncesBundleAssert\CityExist
-     * @ORM\OneToOne(targetEntity="AnnoncesBundle\Entity\Ville", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="AnnoncesBundle\Entity\Ville", cascade={"persist"})
      * @ORM\JoinColumn(unique=false)
      */
     private $city;

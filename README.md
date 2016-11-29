@@ -10,80 +10,98 @@ It do not have authentication system, but it could be implemented later.
 Endpoints
 =========
 
-This API provides two distinct resources : Annonces, and Categories.
+This API provides four distinct resources : Annonces, Villes, Categories and Photos.
 
 Annonces
 --------
 
 This is a list of all availables URL :
 
-- GET api/annonces 			-> Get a list of annonces
+- GET api/annonces 			-> Get a list of adverts
 
-- GET api/annonces/{id}		-> Get a specific annonce
+- GET api/annonces/{id}		-> Get a specific advert
 
-- POST api/annonces			-> Post a new annonce
+- POST api/annonces			-> Post a new advert
 
-- PUT api/annonces/{id} 	-> Edit an existing annonce
+- PUT api/annonces/{id} 	-> Edit an existing advert
 
-- DELETE api/annonces/{id}  -> Delete an existing annonce
+- DELETE api/annonces/{id}  -> Delete an existing advert
 
 ### GET api/annonces
 
-Get a list of annonces by category and/or city.
+Get a list of adverts by category and/or city.
 
-Results are paginated : return a maximum of 10 annonces.
+Results are paginated : return a maximum of 10 adverts.
 
 ####Parameters
 
-city		Search criteria
-category	Search criteria
-page		Requested page
+URL parameters:
+city			Search criteria
+category		Search criteria
+page			Requested page
 
 
 ### GET api/annonces/{id}
 
-Get a specific annonce by its unique id.
+Get a specific advert by its unique id.
 
 ####Parameters
 
-id		unique id of an annonce.
+URL parameters :
+id		unique id of an advert.
 
 
 ### POST api/annonces
 
-Post a new annonce.
+Post a new advert. You must specify a category by its name or its id and it's the same for the city. If id and name are specified, only id will be used.
+If successfully executed, will return this advert will its associated id.
 
 ####Parameters
 
-title		
-content
-prix
-category
-city
-photos
+POST parameters :
+title			Title of the advert		
+content			Content of this advert
+prix			Price (optional)
+category		Name of the category
+id_category		Id of the category
+city			Name of the city
+id_city			Id of the city
+id_photo_1		Picture associated to this advert (optional)
+id_photo_2		Picture associated to this advert (optional)
+id_photo_3		Picture associated to this advert (optional)
 
 
 ### PUT /api/annonces/{id}
 
-Edit an existing annonce.
+Edit an existing advert. You must specify its id as url parameter. All others parameters will be send as JSON data.
 
 ####Parameters
 
-id
-title		
-content
-prix
-category
-city
-photos
+URL parameters :
+id				Id of an existing advert
+
+JSON parameters :
+title			Title of this advert		
+content			Content of this advert
+prix			Price (optional)
+category		Name of the category
+id_category		Id of the category
+city			Name of the city
+id_city			Id of the city
+id_photo_1		Picture associated to this advert (optional)
+id_photo_2		Picture associated to this advert (optional)
+id_photo_3		Picture associated to this advert (optional)
+
 
 ### DELETE api/annonces/{id}
 
-Delete an existing annonce.
+Delete an existing advert.
 
 ####Parameters
 
-id		unique id of an annonce.
+URL parameters:
+id				Unique id of an advert.
+
 
 
 Categories
@@ -103,13 +121,55 @@ Like annonces, results are paginated, and return a maximum of 10 categories.
 
 ####Parameters
 
-page		Requested page
+URL parameters:
+page		Requested page of results
 
 
 ### POST ai/categories
 
-Add a new category
+Add a new category. If successfully executed, will return this category with its id.
 
 ####Parameters
 
-name	name of this new category
+POST parameters:
+name	Name of this new category
+
+
+
+Villes
+======
+
+This resource have only one endpoint :
+
+- GET api/villes
+
+### GET api/villes
+
+Get a list of all cities which have at least one advert.
+Like annonces and categories, results are paginated. A request can return a maximum of 10 cities.
+
+####Parameters
+
+URL parameters:
+page		Requested page of results
+
+
+
+Photos
+======
+
+Like cities, photos have only one endpoint available:
+
+- POST api/photos
+
+### POST api/photos
+
+Add pictures to database. This will be marked as "unassociated" until you associate them with an advert, or until pictures expired. Expiration delay : 15 minutes.
+If pictures were successfully added, this request will return their id to let you assiociate them in an advert.
+
+####Parameters
+
+POST parameters:
+photo1		Picture you want to add to database
+photo2		Picture you want to add to database (optional)
+photo3		Picture you want to add to database (optional)
