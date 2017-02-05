@@ -100,18 +100,13 @@ class AnnoncesController extends Controller
 		}
 
 		$form = $this->get('form.factory')->create(AnnonceType::class, $annonce);
-		
+		$form->handleRequest($request);
+
 		//Check and perform
-		if($request->isMethod('post') && $form->handleRequest($request)->isValid())
+		if($request->isMethod('post') && $form->isValid())
 		{
-			
 			foreach($photos as $photo)
 			{
-				//On vérifie que la photo n'est plus dans le formulaire, ou que ses attributs ne sont pas null
-				if($photo->getFile() === null && $photo->getUrl() === null)
-				{
-					$annonce->removePhoto($photo);
-				}
 				if($annonce->getPhotos()->contains($photo) === false)
 				{
 					$photo->setAnnonce(null);
@@ -162,7 +157,7 @@ class AnnoncesController extends Controller
 		//Gestion des photos
 		foreach($annonce->getPhotos() as $photo)
 		{
-			if($photo->getFile() == null)
+			if($photo->getFile() == null && $photo->getUrl() == null)
 			{
 				$annonce->removePhoto($photo);
 			}

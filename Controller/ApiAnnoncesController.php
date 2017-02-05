@@ -10,7 +10,6 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\RequestParam;
 use AnnoncesBundle\Entity\Annonce;
-use FOS\RestBundle\Controller\Annotations\FileParam;
 use AnnoncesBundle\Entity\Photo;
 
 class ApiAnnoncesController extends FOSRestController
@@ -19,8 +18,8 @@ class ApiAnnoncesController extends FOSRestController
 	 * 
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 * 
-	 * @QueryParam(name="ville", requirements="[a-zA-Zéêàè-]+", strict=true, nullable=true)
-	 * @QueryParam(name="category", requirements="[a-zA-Zéêèà-]+", strict=true, nullable=true)
+	 * @QueryParam(name="ville", requirements="[a-zA-Zéêàè-]+", strict=false, nullable=true)
+	 * @QueryParam(name="category", requirements="[a-zA-Zéêèà-]+", strict=false, nullable=true)
 	 * @QueryParam(name="page", requirements="\d+", strict=false, default=1)
 	 * @Get("/annonces")
 	 */
