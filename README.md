@@ -2,6 +2,67 @@ For the purpose of simplify your work, we bring you some functionalities via thi
 
 This API stay simple and easy to use.
 
+Installation
+============
+
+1) Dependencies
+-------------
+
+This bundle use Guzzle client, the FOSRestBundle and the JMSSerializer for work. It's necessary to add these to your composer :
+
+```console
+$composer require guzzlehttp/guzzle ^6.2
+```
+
+```console
+$composer require friendsofsymfony/rest-bundle
+```
+
+```console
+$composer require jms/serializer-bundle
+```
+
+2) Registering
+--------------
+
+Next, you need to register them :
+
+```php
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        $bundles = array(
+            // ...
+
+            new MeteoBundle\MeteoBundle(),
+            new JMS\SerializerBundle\JMSSerializerBundle(),
+            new FOS\RestBundle\FOSRestBundle(),
+        );
+
+        // ...
+    }
+
+    // ...
+}
+```
+
+
+3) Routing
+----------
+
+You have to register the routing file of this bundle in your project file 'routing.yml' :
+
+```yaml
+
+    annonces:
+        resource: "@AnnoncesBundle/Resources/config/routing.yml"
+        prefix: /
+
+```
+
+Now you can use this bundle !
+
 Authentication
 ==============
 
