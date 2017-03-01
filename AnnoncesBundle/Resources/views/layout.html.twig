@@ -15,6 +15,15 @@
 						<li><a href="{{ path('annonces_add') }}">Ajouter une annonce</a></li>
 						<li><a href="{{ path('annonces_add_category') }}">Ajouter une catégorie</a></li>
 					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						{% if is_granted('ROLE_MEMBER') %}
+							<li><a href="{{ path('users_profile') }}">Mon Profil</a></li>
+							<li><a href="{{ path('users_signout') }}">Déconnexion</a></li>
+						{% else %}
+							<li><a href="{{ path('users_signup') }}">Inscription</a></li>
+							<li><a href="{{ path('users_signin') }}">Connexion</a></li>
+						{% endif %}
+					</ul>
 				</div>
 			</nav>
 				

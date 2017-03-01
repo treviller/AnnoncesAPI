@@ -1,0 +1,18 @@
+users_signup:
+     path: /signup
+     defaults:
+         _controller: UsersBundle:Main:signUp
+
+users_signin:
+    path: /login
+    defaults:
+        _controller: UsersBundle:Main:signIn
+
+users_signout:
+    path: /logout
+
+users_profile:
+    path: /profile
+    defaults:
+        _controller: UsersBundle:Main:profile
+
