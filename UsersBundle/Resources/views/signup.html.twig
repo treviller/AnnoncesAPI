@@ -1,8 +1,13 @@
 {% extends 'AnnoncesBundle::layout.html.twig' %}
 
+{%  block title %}
+Inscription
+{% endblock %}
+
 {% block body %}
     <div class="well">
         {{ form(form) }}
+        {# TODO: Vérification mot de passe #}
     </div>
 
 {% endblock %}

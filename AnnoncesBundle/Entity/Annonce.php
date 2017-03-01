@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use AnnoncesBundle\Constraints as AnnoncesBundleAssert;
+use UsersBundle\Entity\User;
 
 /**
  * Annonce
@@ -85,6 +86,15 @@ class Annonce
      * @ORM\OneToMany(targetEntity="AnnoncesBundle\Entity\Photo", cascade={"persist", "remove"}, mappedBy="annonce")
      */
     private $photos;
+
+    /**
+     * @var UsersBundle\Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="UsersBundle\Entity\User")
+     * @ORM\JoinColumn(unique=false)
+     */
+    private $owner;
+
     
     public function __construct()
     {
@@ -127,7 +137,17 @@ class Annonce
     	}
     	
     }
-    
+
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(User $owner)
+    {
+        $this->owner = $owner;
+    }
+
     public function getPhotos()
     {
     	return $this->photos;

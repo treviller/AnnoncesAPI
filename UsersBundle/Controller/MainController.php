@@ -3,6 +3,7 @@ namespace UsersBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
 use UsersBundle\Entity\User;
 use UsersBundle\Form\UserType;
 
@@ -42,4 +43,29 @@ class MainController extends Controller
     {
         return $this->render('UsersBundle::signin.html.twig', array());
     }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    function viewProfileAction()
+    {
+        $this->denyAccessUnlessGranted('ROLE_MEMBER', null, 'Veuillez vous connecter pour accéder à la page.');
+
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        return $this->render('UsersBundle::viewProfile.html.twig', array('user' => $user));
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    function viewAdvertsAction()
+    {
+        $this->denyAccessUnlessGranted('ROLE_MEMBER', null, 'Veuillez vous connecter pour accéder à la page.');
+
+        $annonces = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Annonce')->findBy(array('owner' => $this->getUser()));
+
+        return $this->render('UsersBundle::viewAdverts.html.twig', array('annonces' => $annonces));
+    }
+
 }

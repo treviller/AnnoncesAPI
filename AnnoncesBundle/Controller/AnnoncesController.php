@@ -6,6 +6,7 @@ use AnnoncesBundle\Entity\Annonce;
 use AnnoncesBundle\Form\Type\AnnonceType;
 use AnnoncesBundle\Form\Type\CategoryType;
 use AnnoncesBundle\Entity\Category;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use AnnoncesBundle\Entity\Photo;
@@ -14,7 +15,11 @@ use AnnoncesBundle\Entity\Ville;
 
 class AnnoncesController extends Controller
 {
-	public function homeAction(Request $request)
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function homeAction(Request $request)
 	{
 		$em = $this->getDoctrine()->getManager();
 		$annonces = array();
@@ -29,9 +34,16 @@ class AnnoncesController extends Controller
 		
 		return $this->render('AnnoncesBundle:Annonces:home.html.twig', array('categories' => $categories, 'annonces' => $annonces));
 	}
-	
-	public function addAction(Request $request)
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addAction(Request $request)
 	{
+	    //Seuls les membres peuvent poster des annonces
+	    $this->denyAccessUnlessGranted('ROLE_MEMBER', null, 'Veuillez vous connecter pour accéder à la page.');
+
 		$annonce = new Annonce();
 		$annonce->addPhoto(new Photo());
 		$form = $this->get('form.factory')->create(AnnonceType::class, $annonce);
@@ -39,6 +51,7 @@ class AnnoncesController extends Controller
 		if($request->isMethod("post") && $form->handleRequest($request)->isValid())
 		{
 			$this->handleAnnonce($annonce);
+			$annonce->setOwner($this->getUser());
 			
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($annonce);
@@ -50,9 +63,16 @@ class AnnoncesController extends Controller
 		
 		return $this->render('AnnoncesBundle:Annonces:add.html.twig', array('form' => $form->createView()));
 	}
-	
-	public function addCategoryAction(Request $request)
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addCategoryAction(Request $request)
 	{
+	    //Accès réservé aux admins
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Acces denied.');
+
 		$category = new Category();
 		$form = $this->get('form.factory')->create(CategoryType::class, $category);
 		
@@ -67,8 +87,12 @@ class AnnoncesController extends Controller
 		
 		return $this->render('AnnoncesBundle:Annonces:addCategory.html.twig', array('form' => $form->createView()));
 	}
-	
-	public function viewAction($id)
+
+    /**
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($id)
 	{
 		$annonce = $this->getDoctrine()->getManager()->getRepository('AnnoncesBundle:Annonce')->findAnnonceWithCatAndPhotos($id);
 		
@@ -79,15 +103,26 @@ class AnnoncesController extends Controller
 		
 		return $this->render('AnnoncesBundle:Annonces:view.html.twig', array('annonce' => $annonce));
 	}
-	
-	public function editAction($id, Request $request)
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction($id, Request $request)
 	{
+        //Seuls les membres peuvent éditer des annonces
+        $this->denyAccessUnlessGranted('ROLE_MEMBER', null, 'Veuillez vous connecter pour accéder à la page.');
+
 		//Initialisation
 		$em = $this->getDoctrine()->getManager();
 		$annonce = $em->getRepository('AnnoncesBundle:Annonce')->findAnnonceWithCatAndPhotos($id);
 		
 		if($annonce === null)
 			throw new NotFoundHttpException('L\'annonce spécifiée est introuvable.');
+
+		if($annonce->getOwner() !== $this->getUser())
+		    throw new AccessDeniedException('Vous n\'avez pas les droits pour modifier cette annonce.');
 		
 		$oldCity = $annonce->getCity();
 		$annonce->setCity($annonce->getCity()->getName());
@@ -130,15 +165,26 @@ class AnnoncesController extends Controller
 		
 		return $this->render('AnnoncesBundle:Annonces:edit.html.twig', array('annonce' => $annonce, 'form' => $form->createView()));
 	}
-	
-	public function deleteAction(Request $request, $id)
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction(Request $request, $id)
 	{
+	    //Seuls les membres peuvent supprimer des annonces
+        $this->denyAccessUnlessGranted('ROLE_MEMBER', null, 'Veuillez vous connecter pour accéder à la page.');
+
 		$em = $this->getDoctrine()->getManager();
 		$annonce = $em->getRepository('AnnoncesBundle:Annonce')->findOneBy(array('id' => $id));
 		
 		if($annonce === null)
 			throw new NotFoundHttpException('L\'annonce spécifiée est introuvable.');
-		
+
+        if($annonce->getOwner() !== $this->getUser())
+            throw new AccessDeniedException('Vous n\'avez pas les droits pour supprimer cette annonce.');
+
 		$city = $annonce->getCity();
 			
 		$em->remove($annonce);
@@ -149,8 +195,12 @@ class AnnoncesController extends Controller
 		$request->getSession()->getFlashBag()->add('info', 'L\'annonce a bien été supprimée.');
 		return $this->redirectToRoute('annonces_home');
 	}
-	
-	//A utiliser plus tard sur edit
+
+    /**
+     * @param $annonce L'annonce à gérer
+     *
+     * Prépare l'annonce pour la persister en bdd avec ses attributs (ville, photos)
+     */
 	protected function handleAnnonce($annonce)
 	{
 		$em = $this->getDoctrine()->getManager();
@@ -172,7 +222,12 @@ class AnnoncesController extends Controller
 		}
 		$annonce->setCity($city);
 	}
-	
+
+    /**
+     * @param $city Ville concernée
+     *
+     * Vérifie que la ville est déjà présente dans la base, et la supprime au besoin.
+     */
 	protected function checkCityInDB($city)
 	{
 		$em = $this->getDoctrine()->getManager();

@@ -12,7 +12,11 @@ users_signout:
     path: /logout
 
 users_profile:
-    path: /profile
+    path: /account/profile
     defaults:
-        _controller: UsersBundle:Main:profile
+        _controller: UsersBundle:Main:viewProfile
 
+users_adverts:
+    path: /account/adverts
+    defaults:
+        _controller: UsersBundle:Main:viewAdverts

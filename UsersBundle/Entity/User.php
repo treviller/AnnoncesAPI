@@ -136,7 +136,7 @@ class User implements UserInterface, \Serializable
      */
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+        return null; //Pas nécessaire pour le moment
     }
 
     /**
@@ -147,7 +147,7 @@ class User implements UserInterface, \Serializable
      */
     public function serialize()
     {
-        // TODO: Implement serialize() method.
+        return serialize(array($this->id, $this->username, $this->password));
     }
 
     /**
@@ -161,6 +161,6 @@ class User implements UserInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        // TODO: Implement unserialize() method.
+        list($this->id, $this->username, $this->password) = unserialize($serialized);
     }
 }

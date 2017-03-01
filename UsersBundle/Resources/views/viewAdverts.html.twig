@@ -1,0 +1,23 @@
+{% extends 'UsersBundle::accountLayout.html.twig' %}
+
+{%  block title %}
+    Profil
+{% endblock %}
+
+{% block body %}
+    <h2>Vos annonces</h2>
+
+    {{ parent() }}
+
+    <div class="col-lg-6">
+        <ul class="list-group">
+        {% for annonce in annonces %}
+            <li class="list-group-item">
+                <a href="{{ path('annonces_view', {'id' : annonce.id}) }}">{{ annonce.title }}</a>
+                <a class=" btn-danger pull-right" href="{{ path('annonces_delete', {'id' : annonce.id}) }}">Supprimer</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

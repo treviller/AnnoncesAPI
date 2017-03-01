@@ -8,7 +8,7 @@
 	<header class="page-header">
 		<h2>{{ annonce.title }}</h2>
 			
-		<p>postée le {{ annonce.datePost|date('d/m/Y \\à H:i') }} à <strong>{{ annonce.city.name }}</strong> dans <i>{{ annonce.category.name }}</i></p>
+		<p>postée par <strong>{{ annonce.owner.username }}</strong> le {{ annonce.datePost|date('d/m/Y \\à H:i') }} à <strong>{{ annonce.city.name }}</strong> dans <i>{{ annonce.category.name }}</i></p>
 	</header>
 
 	<section class="row">
@@ -43,9 +43,11 @@
 			Prix : {% if annonce.prix %}{{ annonce.prix }}€{% else %}non défini{% endif %}
 		</div>
 		
-		<a href="{{ path('annonces_home') }}" class="btn btn-default">Retour à la liste des annonces</a>		
+		<a href="{{ path('annonces_home') }}" class="btn btn-default">Retour à la liste des annonces</a>
+		{% if is_granted('ROLE_MEMBER') and app.user.username == annonce.owner.username %}
 		<a href="{{ path('annonces_edit', {'id': annonce.id}) }}" class="btn btn-default">Modifier</a>
 		<a href="{{ path('annonces_delete', {'id': annonce.id}) }}" class="btn btn-danger">Supprimer</a>
+		{% endif %}
 	</section>
 	
 	

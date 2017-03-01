@@ -1,0 +1,25 @@
+{% extends 'UsersBundle::accountLayout.html.twig' %}
+
+{%  block title %}
+Profil
+{% endblock %}
+
+{% block body %}
+    <h2>Votre profil</h2>
+
+    {{ parent() }}
+
+    <div class="col-lg-6">
+        <h3>Pseudo : </h3>
+        <p>{{ app.user.username }}</p>
+    </div>
+
+    <div class="col-lg-6">
+        <h3>Clé d'API : </h3>
+        <p>{{ app.user.email }}</p>
+    </div>
+
+
+    <!--<button class="btn btn-default">Modifier mot de passe</button> -->
+
+{% endblock %}
